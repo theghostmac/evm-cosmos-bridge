@@ -1,8 +1,8 @@
 use ethers::core::k256::ecdsa::SigningKey;
 use ethers::prelude::*;
-use std::sync::Arc;
-use crate::config::EvmConfig;
 use thiserror::Error;
+
+use crate::config::EvmConfig;
 
 #[derive(Error, Debug)]
 pub enum EvmClientError {
@@ -18,9 +18,9 @@ pub struct EvmClient {
 
 impl EvmClient {
     pub async fn new(config: &EvmConfig) -> Result<Self, EvmClientError> {
-        let provider = Provider::<Http>::try_from(&config.rpc_url)?;
+        let provider = Provider::<Http>::try_from(&config.rpc_url).unwrap();
         let chain_id = config.chain_id;
-        let wallet: LocalWallet = config.private_key.parse()?;
+        let wallet: LocalWallet = config.private_key.parse().unwrap();
         let wallet = wallet.with_chain_id(chain_id);
         let client = SignerMiddleware::new(provider, wallet);
 
@@ -30,7 +30,7 @@ impl EvmClient {
     }
 
     pub async fn get_latest_block(&self) -> Result<Block<TxHash>, EvmClientError> {
-        let block = self.client.get_block(BlockNumber::Latest).await?;
+        let block = self.client.get_block(BlockNumber::Latest).await.unwrap();
         Ok(block.unwrap())
     }
 
